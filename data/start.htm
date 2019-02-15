@@ -1,0 +1,65 @@
+<div class="row">
+	<div class="col">	
+		<h1 class="">Потенциометр</h1>
+	</div>
+</div>
+<div class="row">
+	<div class="col-12 col-md-4">
+		<p>актуальное значение A0 = <span id="A0">###</span></p>
+	</div>
+	<div class="col-12 col-md-4">
+		<p>минимальное значение A0 = <span id="A0min">###</span></p>
+	</div>
+	<div class="col-12 col-md-4">
+		<p>максимальное значение A0 = <span id="A0max">###</span></p>
+	</div>
+</div>
+<div class="row">
+	<div class="col col-md-6 col-xl-4">	
+		<div class="ct-chart ct-perfect-fourth"></div>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+$( document ).ready(function() {
+	// Чтение данных из json-файлов
+	function update_data() {
+		// Загрузка обычных данных из json-файла
+		$.getJSON( "./data.json?A0=A0&A0min=A0min&A0max=A0max", function( data ) {
+			$.each( data, function( key, val ) {
+				$( "#"+key ).text(val);
+			});
+		});
+
+		// Загрузка данных для графика
+		$.getJSON("./char.json", function(data) {
+			// Create a new line chart object where as first parameter we pass in a selector
+			// that is resolving to our chart container element. The Second parameter
+			// is the actual data object.
+			new Chartist.Line(
+				// CSS-класс
+				'.ct-chart',
+				// данные
+				data,
+				// Настройки
+				{
+					// Во всю ширину графика
+					fullWidth: true,
+					// Автонастройка границ оси у
+					low: data.low,
+					high: data.high
+				}
+			);
+		});
+	};
+
+	$(document).attr("title", "Стартовая страничка");
+
+	// Запускаем функцию вручную в первый раз
+	update_data();
+
+	// Запускаем функцию каждые 5 секунд.
+    setInterval(update_data, 5000);
+});
+</script>

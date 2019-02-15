@@ -1,0 +1,170 @@
+<div class="row">
+	<div class="col">	
+		<h1 class="">Настройки</h1>
+	</div>
+</div>
+<div class="row mb-4">
+	<div class="col">
+		<div class="card">
+			<div class="card-header">
+				<h2>Настройки сети</h2>
+			</div>
+			<div class="card-body">
+				<form action="/updateCongigData" method="get" class="mb-3">
+					<div class="row">
+						<div class="col">
+							<div class="form-group">
+								<label for="wifiName">Название WiFi сети</label>
+								<input type="text" class="form-control" id="wifiNameInput" name="wifiName" value="wifiName">
+							</div>
+						</div>
+						<div class="col">
+							<div class="form-group">
+								<label for="wifiPassword">Пароль</label>
+								<input type="password" class="form-control" id="wifiPasswordInput" name="wifiPassword" value="wifiPassword">
+							</div>
+						</div>
+					</div>
+					<input type="submit" class="btn btn-primary" value="Отправить">
+				</form>
+				<hr class="my-4">
+				<form action="/updateCongigData" method="get" class="my-3">
+					<div class="row">
+						<div class="col">
+							<div class="form-group">
+								<label for="APwifiName">Название АР-сети</label>
+								<input type="text" class="form-control" id="APwifiNameInput" name="APwifiName" value="APwifiName">
+							</div>
+						</div>
+						<div class="col">
+							<div class="form-group">
+								<label for="APwifiPassword">Пароль</label>
+								<input type="password" class="form-control" id="APwifiPasswordInput" name="APwifiPassword" value="APwifiPassword">
+							</div>
+						</div>
+					</div>
+					<input type="submit" class="btn btn-primary" value="Отправить">
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row my-4">
+	<div class="col">
+		<div class="card">
+			<div class="card-header">
+				<h2>Настройки времени и даты</h2>
+			</div>
+			<div class="card-body">
+				<form action="/updateCongigData" method="get" class="my-3">
+					<div class="row">
+						<div class="col">
+							<div class="form-group">
+								<label for="timezone">Временная зона</label>
+								<input type="text" class="form-control" id="timezoneInput" name="timezone" value="timezone">
+							</div>
+						</div>
+					</div>
+					<input type="submit" class="btn btn-primary" value="Отправить">
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row mt-4">
+	<div class="col">
+		<div class="card">
+			<div class="card-header">
+				<h2>Перезагрузка</h2>
+			</div>
+			<div class="card-body">
+				<a id="rebootLink" class="btn btn-danger" href="restart?device=ok" role="button">Перезагрузка</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+$( document ).ready(function() {
+	// Чтение данных из json-файлов
+	function update_data() {
+		// Загрузка данных настройки из json-файла
+		$.getJSON( "./liveConfig.json", function( data ) {
+			$.each( data, function( key, val ) {
+				$( "#"+key ).text(val);
+				$( "#"+key+"Input" ).val(val);
+			});
+		});
+
+/*
+		// Загрузка данных для графика
+		$.getJSON("./char.json", function(data) {
+			// Create a new line chart object where as first parameter we pass in a selector
+			// that is resolving to our chart container element. The Second parameter
+			// is the actual data object.
+			new Chartist.Line(
+				// CSS-класс
+				'.ct-chart',
+				// данные
+				data,
+				// Настройки
+				{
+					// Во всю ширину графика
+					fullWidth: true,
+					// Автонастройка границ оси у
+					low: data.low,
+					high: data.high
+				}
+			);
+		});
+*/
+	};
+
+	// Запускаем функцию вручную в первый раз
+	update_data();
+
+	$(document).attr("title", "Настройки");
+
+	// Отправка форм при помощи AJAX-запроса
+	$("div#content form").submit(function(e) {
+		var form = $(this);
+
+		$.ajax({
+			type: "GET",
+			url: "/updateCongigData",
+			data: form.serialize() // serializes the form's elements.
+		});
+
+		e.preventDefault(); // avoid to execute the actual submit of the form.
+	});
+
+	// Отправка команды для перезагрузки при помощи AJAX-запроса
+	$("#rebootLink").click (function (e) {
+		var aLink = $(this);
+		$.ajax({
+			type: "GET",
+			url: aLink.attr("href")
+			//data: "someData=someThing&someMore=somethingElse",
+		});
+
+		e.preventDefault(); // stop the browser following the link
+	});
+
+
+
+
+
+
+
+	// Показываем и скрываем пароль в зависимости от фокуса
+    $( "input[type='password']" ).focus(function() {
+		$(this).attr('type', 'text').focusout(function() {
+			$(this).attr('type', 'password');
+		});
+	});
+
+	// Запускаем функцию каждые 5 секунд.
+    //setInterval(update_data, 5000);
+});
+</script>
